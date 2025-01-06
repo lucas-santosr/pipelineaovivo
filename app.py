@@ -1,5 +1,7 @@
 import streamlit as st
+from contrato import Vendas
 from datetime import datetime, time 
+from pydantic import ValidationError
 
 def main():
 
@@ -12,16 +14,20 @@ def main():
     produto = st.selectbox("Produto", options=["ZapFlow com Gemini","ZapFlow com ChatGPT","ZapFlow com Llama3.0"])
 
     if st.button("Salvar"):
+        try:
+            data_hora = datetime.combine(data, hora)
+        
+            venda = Vendas(
+                email = email,
+                data = data_hora,
+                valor = valor,
+                quantidade = quantidade,
+                produto = produto
+            )
 
-        data_hora = datetime.combine(data, hora)
-        st.write("**Dados da Venda:**")
-        st.write(f"E-mail do Vendedor: {email}")
-        st.write(f"Data e Hora da Compra: {data_hora}")
-        st.write(f"Valor da Venda: R$ {valor:.2f}")
-        st.write(f"Quantidade de Produtos: {quantidade}")
-        st.write(f"Produto: {produto}")
+            st.write(venda)
+        except ValidationError as e:
+            st.error(f"Deu erro {e}")
 
-
-    
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
